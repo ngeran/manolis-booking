@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
+
+export const dynamic = "force-dynamic";
 import { campaigns } from "@/db/schema";
 import { eq } from "drizzle-orm";
 

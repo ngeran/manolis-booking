@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { reservations } from "@/db/schema";
+
+export const dynamic = "force-dynamic";
 import { eq } from "drizzle-orm";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {

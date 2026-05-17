@@ -61,11 +61,11 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-headline text-2xl uppercase tracking-headline">Customers</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="font-headline text-xl sm:text-2xl uppercase tracking-headline">Customers</h1>
         <button onClick={() => { resetForm(); setShowAdd(true); }} className="btn-primary text-xs font-headline uppercase tracking-headline">
-          + Add Customer
+          + Add
         </button>
       </div>
 
@@ -75,14 +75,14 @@ export default function CustomersPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm mt-2"
-          placeholder="Search by name, phone, or email (min 2 chars)..."
+          placeholder="Search by name, phone, or email..."
         />
       </BorderTile>
 
       {/* Add/Edit Form */}
       {(showAdd || editing) && (
         <BorderTile title={editing ? "Edit Customer" : "New Customer"}>
-          <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-3 mt-2">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">First Name</label>
               <input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
@@ -107,10 +107,10 @@ export default function CustomersPage() {
               <label className="block text-xs text-outline font-headline uppercase mb-1">Dietary Notes</label>
               <input value={form.dietaryNotes} onChange={(e) => setForm({ ...form, dietaryNotes: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
             </div>
-            <div className="col-span-3 flex items-center gap-4">
+            <div className="sm:col-span-3 flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={form.optInMarketing} onChange={(e) => setForm({ ...form, optInMarketing: e.target.checked })} className="w-4 h-4 accent-cyber-blue" />
-                <span className="text-xs text-outline font-headline uppercase">Opt-in Marketing</span>
+                <input type="checkbox" checked={form.optInMarketing} onChange={(e) => setForm({ ...form, optInMarketing: e.target.checked })} className="w-5 h-5 accent-cyber-blue" />
+                <span className="text-xs text-outline font-headline uppercase">Marketing</span>
               </label>
               <div className="flex-1" />
               <button type="button" onClick={resetForm} className="btn-ghost text-xs">Cancel</button>
@@ -122,12 +122,13 @@ export default function CustomersPage() {
         </BorderTile>
       )}
 
-      {/* Table */}
+      {/* Customer List */}
       {isLoading ? (
         <LoadingSkeleton rows={6} />
       ) : (
         <BorderTile title={`Customers (${customers?.length ?? 0})`}>
-          <div className="overflow-auto mt-2">
+          {/* Desktop Table */}
+          <div className="hidden sm:block overflow-auto mt-2">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-obsidian text-left">
@@ -136,7 +137,7 @@ export default function CustomersPage() {
                   <th className="px-3 py-2 font-headline text-xs uppercase text-outline">Email</th>
                   <th className="px-3 py-2 font-headline text-xs uppercase text-outline text-center">Visits</th>
                   <th className="px-3 py-2 font-headline text-xs uppercase text-outline">Last Visit</th>
-                  <th className="px-3 py-2 font-headline text-xs uppercase text-outline text-center">Marketing</th>
+                  <th className="px-3 py-2 font-headline text-xs uppercase text-outline text-center">Mkt</th>
                   <th className="px-3 py-2 font-headline text-xs uppercase text-outline">Actions</th>
                 </tr>
               </thead>
@@ -150,9 +151,7 @@ export default function CustomersPage() {
                     <td className="px-3 py-2 text-outline">{c.lastVisit ? new Date(c.lastVisit).toLocaleDateString() : "—"}</td>
                     <td className="px-3 py-2 text-center">{c.optInMarketing ? <span className="text-cyber-blue">YES</span> : <span className="text-outline">NO</span>}</td>
                     <td className="px-3 py-2">
-                      <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs font-headline uppercase hover:underline">
-                        Edit
-                      </button>
+                      <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs font-headline uppercase hover:underline">Edit</button>
                     </td>
                   </tr>
                 ))}
@@ -165,6 +164,32 @@ export default function CustomersPage() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="sm:hidden space-y-2 mt-2">
+            {(!customers || customers.length === 0) && (
+              <p className="text-xs text-outline font-headline py-3 text-center">
+                {search.length < 2 ? "Type at least 2 chars to search" : "No customers found"}
+              </p>
+            )}
+            {customers?.map((c) => (
+              <div key={c.id} className="border border-obsidian p-3 bg-surface-low">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-white">{c.firstName} {c.lastName}</p>
+                    <p className="text-xs text-outline">{c.phone}</p>
+                    {c.email && <p className="text-xs text-outline">{c.email}</p>}
+                  </div>
+                  <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs font-headline uppercase ml-2">Edit</button>
+                </div>
+                <div className="flex items-center gap-3 mt-2 text-xs text-outline">
+                  <span>{c.totalVisits} visits</span>
+                  <span>{c.lastVisit ? new Date(c.lastVisit).toLocaleDateString() : "—"}</span>
+                  {c.optInMarketing && <span className="text-cyber-blue">MKT</span>}
+                </div>
+              </div>
+            ))}
           </div>
         </BorderTile>
       )}

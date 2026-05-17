@@ -79,49 +79,47 @@ export default function ReservationsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-headline text-2xl uppercase tracking-headline">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="font-headline text-xl sm:text-2xl uppercase tracking-headline">
           Reservations
         </h1>
-        <div className="flex items-center gap-3">
-          {/* View mode toggle */}
+        <div className="flex items-center gap-2">
           <div className="flex border border-obsidian">
             <button
               onClick={() => setViewMode("single")}
-              className={`px-3 py-1 text-xs font-headline uppercase tracking-headline ${
+              className={`px-2 sm:px-3 py-1.5 text-xs font-headline uppercase tracking-headline ${
                 viewMode === "single" ? "bg-obsidian text-white" : "text-outline"
               }`}
             >
-              Single Day
+              Day
             </button>
             <button
               onClick={() => setViewMode("range")}
-              className={`px-3 py-1 text-xs font-headline uppercase tracking-headline ${
+              className={`px-2 sm:px-3 py-1.5 text-xs font-headline uppercase tracking-headline ${
                 viewMode === "range" ? "bg-obsidian text-white" : "text-outline"
               }`}
             >
-              Date Range
+              Range
             </button>
           </div>
 
-          {/* CSV Export */}
           <button
             onClick={() => reservations && exportCSV(reservations)}
             disabled={!reservations?.length}
-            className="btn-ghost text-xs px-3 py-1 font-headline uppercase tracking-headline"
+            className="btn-ghost text-xs px-2 sm:px-3 py-1.5 font-headline uppercase tracking-headline"
           >
-            Export CSV
+            CSV
           </button>
         </div>
       </div>
 
       {/* Date Selection */}
       <BorderTile title="Date Filter">
-        <div className="flex items-center gap-4 mt-2">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2">
           {viewMode === "single" ? (
             <div>
-              <label className="block text-xs text-outline font-headline uppercase mb-1">Select Date</label>
+              <label className="block text-xs text-outline font-headline uppercase mb-1">Date</label>
               <input
                 type="date"
                 value={selectedDate}
@@ -130,7 +128,7 @@ export default function ReservationsPage() {
               />
             </div>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">From</label>
                 <input
@@ -140,7 +138,7 @@ export default function ReservationsPage() {
                   className="bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
                 />
               </div>
-              <span className="text-outline mt-4">—</span>
+              <span className="text-outline hidden sm:block mt-4">—</span>
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">To</label>
                 <input
@@ -171,44 +169,29 @@ export default function ReservationsPage() {
         <div className="space-y-2">
           {reservations.map((r) => (
             <BorderTile key={r.id}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  {/* Date + Time */}
-                  <div className="w-28">
+              <div className="flex flex-col gap-3">
+                {/* Row 1: Time + Customer + Party */}
+                <div className="flex items-start gap-3">
+                  <div>
                     <p className="font-headline text-cyber-blue">{formatTime(r.reservationTime)}</p>
                     <p className="text-xs text-outline">{r.reservationDate}</p>
                   </div>
-
-                  {/* Customer */}
-                  <div className="w-48">
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm text-white">
                       {r.customerFirstName} {r.customerLastName}
                     </p>
-                    <p className="text-xs text-outline">{r.customerPhone}</p>
-                  </div>
-
-                  {/* Party */}
-                  <div className="w-20 text-center">
-                    <p className="text-lg font-headline text-white">{r.partySize}</p>
-                    <p className="text-xs text-outline">guests</p>
-                  </div>
-
-                  {/* Special Requests */}
-                  <div className="flex-1 max-w-xs">
-                    {r.specialRequests ? (
-                      <p className="text-xs text-tactical-gold truncate">{r.specialRequests}</p>
-                    ) : (
-                      <p className="text-xs text-outline">—</p>
+                    <p className="text-xs text-outline">{r.customerPhone} • {r.partySize} guests</p>
+                    {r.specialRequests && (
+                      <p className="text-xs text-tactical-gold truncate mt-0.5">{r.specialRequests}</p>
                     )}
                   </div>
                 </div>
 
-                {/* Status + Actions */}
-                <div className="flex items-center gap-3">
+                {/* Row 2: Status + Actions */}
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className={`text-xs font-headline uppercase tracking-headline border px-2 py-1 ${statusColors[r.status] || "text-outline border-outline"}`}>
                     {r.status.replace("_", " ")}
                   </span>
-
                   {r.status === "confirmed" && (
                     <>
                       <button

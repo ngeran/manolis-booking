@@ -59,7 +59,7 @@ export default function SettingsPage() {
       {/* Manage Employees — Admin Only */}
       {role === "admin" && (
         <BorderTile title="Manage Employees">
-          <form onSubmit={handleCreateEmployee} className="grid grid-cols-2 gap-3 mt-2">
+          <form onSubmit={handleCreateEmployee} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Username</label>
               <input value={username} onChange={(e) => setUsername(e.target.value)} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />

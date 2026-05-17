@@ -8,7 +8,7 @@ interface BorderTileProps {
 
 export default function BorderTile({ title, children, className = "" }: BorderTileProps) {
   return (
-    <div className={`relative border border-obsidian p-[0.9rem] ${className}`}>
+    <div className={`relative border border-obsidian p-3 sm:p-[0.9rem] ${className}`}>
       {title && (
         <span className="absolute -top-[8px] left-3 bg-void px-2 text-xs font-headline uppercase tracking-headline text-outline">
           {title}

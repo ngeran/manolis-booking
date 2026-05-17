@@ -43,7 +43,6 @@ export default function DashboardPage() {
   const { data: todayReservations, isLoading: resLoading } = useReservations(today);
   const createRes = useCreateReservation();
 
-  // Quick reservation form
   const [custName, setCustName] = useState("");
   const [custPhone, setCustPhone] = useState("");
   const [partySize, setPartySize] = useState(2);
@@ -51,7 +50,6 @@ export default function DashboardPage() {
   const [resTime, setResTime] = useState("19:00:00");
   const [specialReqs, setSpecialReqs] = useState("");
 
-  // Customer lookup
   const [customerSearch, setCustomerSearch] = useState("");
   const { data: searchResults, isLoading: searchLoading } = useCustomers(
     customerSearch.length >= 2 ? customerSearch : undefined
@@ -79,14 +77,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Greeting */}
-      <div className="flex items-center justify-between">
-        <h1 className="font-headline text-2xl uppercase tracking-headline">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="font-headline text-xl sm:text-2xl uppercase tracking-headline">
           Welcome, <span className="text-cyber-blue">{employeeName}</span>
         </h1>
         <span className="font-headline text-xs text-outline uppercase tracking-headline">
-          {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+          {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
         </span>
       </div>
 
@@ -94,27 +92,27 @@ export default function DashboardPage() {
       {statsLoading ? (
         <LoadingSkeleton rows={1} />
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <BorderTile title="Today">
-            <p className="text-3xl font-headline text-white">{stats?.todayReservations ?? 0}</p>
+            <p className="text-2xl sm:text-3xl font-headline text-white">{stats?.todayReservations ?? 0}</p>
             <p className="text-xs text-outline font-headline uppercase tracking-headline mt-1">Reservations</p>
           </BorderTile>
           <BorderTile title="This Week">
-            <p className="text-3xl font-headline text-white">{stats?.weekReservations ?? 0}</p>
+            <p className="text-2xl sm:text-3xl font-headline text-white">{stats?.weekReservations ?? 0}</p>
             <p className="text-xs text-outline font-headline uppercase tracking-headline mt-1">Total Bookings</p>
           </BorderTile>
-          <BorderTile title="Expected Guests">
-            <p className="text-3xl font-headline text-tactical-gold">{stats?.todayGuests ?? 0}</p>
+          <BorderTile title="Guests">
+            <p className="text-2xl sm:text-3xl font-headline text-tactical-gold">{stats?.todayGuests ?? 0}</p>
             <p className="text-xs text-outline font-headline uppercase tracking-headline mt-1">Covers Today</p>
           </BorderTile>
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Quick Reservation Form */}
         <BorderTile title="Quick Reservation">
           <form onSubmit={handleQuickBook} className="space-y-3 mt-2">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Name</label>
                 <input
@@ -136,7 +134,7 @@ export default function DashboardPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Party Size</label>
                 <input
@@ -183,7 +181,7 @@ export default function DashboardPage() {
             <button
               type="submit"
               disabled={createRes.isPending}
-              className="w-full bg-obsidian text-white py-2 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50"
+              className="w-full bg-obsidian text-white py-2.5 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50"
             >
               {createRes.isPending ? "Booking..." : "Book Reservation"}
             </button>
@@ -201,7 +199,7 @@ export default function DashboardPage() {
             />
             {searchLoading && customerSearch.length >= 2 && <LoadingSkeleton rows={2} />}
             {searchResults && customerSearch.length >= 2 && (
-              <div className="space-y-2 max-h-64 overflow-auto">
+              <div className="space-y-2 max-h-48 sm:max-h-64 overflow-auto">
                 {searchResults.length === 0 && (
                   <p className="text-xs text-outline font-headline">No customers found</p>
                 )}
@@ -229,13 +227,13 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-2 mt-2">
             {todayReservations.map((r) => (
-              <div key={r.id} className="flex items-center justify-between border border-obsidian p-3 bg-surface-low">
-                <div className="flex items-center gap-4">
-                  <span className="font-headline text-cyber-blue text-lg w-20">{formatTime(r.reservationTime)}</span>
+              <div key={r.id} className="flex flex-col sm:flex-row sm:items-center justify-between border border-obsidian p-3 bg-surface-low gap-2">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <span className="font-headline text-cyber-blue text-base sm:text-lg">{formatTime(r.reservationTime)}</span>
                   <div>
                     <p className="text-sm text-white">
                       {r.customerFirstName} {r.customerLastName}
-                      <span className="text-outline ml-2">({r.customerPhone})</span>
+                      <span className="text-outline ml-2 text-xs">({r.customerPhone})</span>
                     </p>
                     <p className="text-xs text-outline">
                       Party of {r.partySize}

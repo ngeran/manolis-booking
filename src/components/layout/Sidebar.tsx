@@ -47,7 +47,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-48 min-h-[calc(100vh-3rem)] border-r border-outline bg-void py-4">
+    <aside className="hidden md:block w-48 min-h-[calc(100vh-3rem)] border-r border-outline bg-void py-4">
       <nav className="space-y-1 px-2">
         {navItems.map((item) => {
           const active = pathname === item.href;

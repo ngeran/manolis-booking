@@ -18,31 +18,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const user = await db
-          .select()
-          .from(users)
-          .where(eq(users.username, credentials.username as string))
-          .limit(1);
+        try {
+          const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.username, credentials.username as string))
+            .limit(1);
 
-        if (!user.length) return null;
+          if (!user.length) return null;
 
-        const valid = await bcrypt.compare(
-          credentials.password as string,
-          user[0].passwordHash
-        );
-        if (!valid) return null;
+          const valid = await bcrypt.compare(
+            credentials.password as string,
+            user[0].passwordHash
+          );
+          if (!valid) return null;
 
-        await db
-          .update(users)
-          .set({ lastLogin: new Date() })
-          .where(eq(users.id, user[0].id));
+          await db
+            .update(users)
+            .set({ lastLogin: new Date() })
+            .where(eq(users.id, user[0].id));
 
-        return {
-          id: user[0].id,
-          name: user[0].fullName,
-          email: user[0].email,
-          role: user[0].role,
-        };
+          return {
+            id: user[0].id,
+            name: user[0].fullName,
+            email: user[0].email,
+            role: user[0].role,
+          };
+        } catch (error) {
+          console.error("[AUTH] Login error:", error);
+          return null;
+        }
       },
     }),
   ],
@@ -68,4 +73,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
   },
+  debug: process.env.NODE_ENV === "development",
 });

@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Environment files (secrets — set these in Vercel dashboard)
+.env
+.env.*
+!.env.example
+
+# Drizzle migration meta (generated, not needed for deploy)
+drizzle/meta/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Local dev script artifacts
+.manolis-dev.pid
+.manolis-dev.log
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap");
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-headline uppercase tracking-headline;
+  }
+
+  body {
+    @apply font-body bg-void text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-obsidian text-white px-4 py-2 rounded-none border-none cursor-pointer
+           hover:brightness-110 active:animate-pulse transition-all;
+  }
+
+  .btn-ghost {
+    @apply border border-cyber-blue bg-transparent text-cyber-blue px-4 py-2
+           rounded-none cursor-pointer hover:bg-cyber-blue/10 transition-all;
+  }
+
+  .loading-skeleton {
+    @apply bg-black border border-obsidian animate-pulse;
+  }
+
+  .command-bar {
+    @apply border-b border-outline px-4 py-2 font-headline text-sm uppercase
+           tracking-headline;
+  }
+
+  .shortcut-bar {
+    @apply absolute bottom-0 left-0 right-0 border-t border-outline px-4 py-2
+           font-headline text-sm uppercase tracking-headline bg-void;
+  }
+}
+
+* {
+  border-radius: 0px !important;
+}

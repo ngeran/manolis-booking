@@ -3,8 +3,11 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
+
+const VALID_ROLES = ["admin", "staff", "manager"];
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await auth();
@@ -15,16 +18,27 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const body = await req.json();
 
-  // If password is provided, hash it
+  // Whitelist editable fields — never pass the request body straight to the DB
+  const updates: Partial<typeof users.$inferInsert> = {};
+  if (body.email !== undefined) updates.email = body.email;
+  if (body.fullName !== undefined) updates.fullName = body.fullName;
+  if (body.role !== undefined) {
+    if (!VALID_ROLES.includes(body.role)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+    updates.role = body.role;
+  }
   if (body.password) {
-    const bcrypt = require("bcryptjs");
-    body.passwordHash = await bcrypt.hash(body.password, 10);
-    delete body.password;
+    updates.passwordHash = await bcrypt.hash(body.password, 10);
+  }
+
+  if (!Object.keys(updates).length) {
+    return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
   }
 
   const [updated] = await db
     .update(users)
-    .set(body)
+    .set(updates)
     .where(eq(users.id, params.id))
     .returning({
       id: users.id,

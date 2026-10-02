@@ -49,8 +49,9 @@ function getWeekDates(offset: number): Date[] {
   });
 }
 
+// Local calendar date — toISOString() would shift the day in UTC+ timezones
 function fmt(date: Date) {
-  return date.toISOString().split("T")[0];
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 function isToday(date: Date) {
@@ -363,7 +364,7 @@ export default function ReservationsPage() {
                   onChange={(e) => { setAddForm({ ...addForm, customerPhone: e.target.value }); setPhoneLookup(e.target.value); }}
                   onBlur={handlePhoneBlur}
                   required
-                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   placeholder="(555) 123-4567"
                 />
                 {foundCustomers && foundCustomers.length > 0 && phoneLookup.length >= 3 && (
@@ -372,28 +373,28 @@ export default function ReservationsPage() {
               </div>
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Name</label>
-                <input value={addForm.customerName} onChange={(e) => setAddForm({ ...addForm, customerName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" placeholder="Full name" />
+                <input value={addForm.customerName} onChange={(e) => setAddForm({ ...addForm, customerName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" placeholder="Full name" />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Party Size</label>
-                <input type="number" min={1} max={20} value={addForm.partySize} onChange={(e) => setAddForm({ ...addForm, partySize: parseInt(e.target.value) || 1 })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+                <input type="number" min={1} max={20} value={addForm.partySize} onChange={(e) => setAddForm({ ...addForm, partySize: parseInt(e.target.value) || 1 })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
               </div>
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Date</label>
-                <input type="date" value={addForm.reservationDate} onChange={(e) => setAddForm({ ...addForm, reservationDate: e.target.value })} min={fmt(new Date())} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+                <input type="date" value={addForm.reservationDate} onChange={(e) => setAddForm({ ...addForm, reservationDate: e.target.value })} min={fmt(new Date())} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
               </div>
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Time</label>
-                <select value={addForm.reservationTime} onChange={(e) => setAddForm({ ...addForm, reservationTime: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm">
+                <select value={addForm.reservationTime} onChange={(e) => setAddForm({ ...addForm, reservationTime: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base">
                   {timeSlots.map((t, i) => (<option key={i} value={t!}>{formatTime(t!)}</option>))}
                 </select>
               </div>
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Special Requests</label>
-              <input value={addForm.specialRequests} onChange={(e) => setAddForm({ ...addForm, specialRequests: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" placeholder="Allergies, celebrations..." />
+              <input value={addForm.specialRequests} onChange={(e) => setAddForm({ ...addForm, specialRequests: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" placeholder="Allergies, celebrations..." />
             </div>
             <div className="flex gap-2 pt-2">
               <button type="submit" disabled={createRes.isPending} className="flex-1 bg-obsidian text-white py-2.5 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50">
@@ -420,18 +421,18 @@ export default function ReservationsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Time</label>
-                <select value={editForm.reservationTime} onChange={(e) => setEditForm({ ...editForm, reservationTime: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm">
+                <select value={editForm.reservationTime} onChange={(e) => setEditForm({ ...editForm, reservationTime: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base">
                   {timeSlots.map((t, i) => (<option key={i} value={t!}>{formatTime(t!)}</option>))}
                 </select>
               </div>
               <div>
                 <label className="block text-xs text-outline font-headline uppercase mb-1">Party Size</label>
-                <input type="number" min={1} max={20} value={editForm.partySize} onChange={(e) => setEditForm({ ...editForm, partySize: parseInt(e.target.value) || 1 })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+                <input type="number" min={1} max={20} value={editForm.partySize} onChange={(e) => setEditForm({ ...editForm, partySize: parseInt(e.target.value) || 1 })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
               </div>
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Status</label>
-              <select value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm">
+              <select value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base">
                 <option value="confirmed">Confirmed</option>
                 <option value="seated">Seated</option>
                 <option value="cancelled">Cancelled</option>
@@ -440,7 +441,7 @@ export default function ReservationsPage() {
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Special Requests</label>
-              <input value={editForm.specialRequests} onChange={(e) => setEditForm({ ...editForm, specialRequests: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+              <input value={editForm.specialRequests} onChange={(e) => setEditForm({ ...editForm, specialRequests: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div className="flex gap-2 pt-2">
               <button type="submit" disabled={updateRes.isPending} className="flex-1 bg-obsidian text-white py-2.5 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50">

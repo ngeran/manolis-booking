@@ -9,8 +9,10 @@ import { useDashboardStats } from "@/hooks/useDashboard";
 import { useReservations, useCreateReservation } from "@/hooks/useReservations";
 import { useCustomers } from "@/hooks/useCustomers";
 
+// Local calendar date — toISOString() would shift the day in UTC+ timezones
 function getToday() {
-  return new Date().toISOString().split("T")[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function formatTime(t: string) {
@@ -119,7 +121,7 @@ export default function DashboardPage() {
                   value={custName}
                   onChange={(e) => setCustName(e.target.value)}
                   required
-                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   placeholder="Full name"
                 />
               </div>
@@ -129,7 +131,7 @@ export default function DashboardPage() {
                   value={custPhone}
                   onChange={(e) => setCustPhone(e.target.value)}
                   required
-                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   placeholder="(555) 123-4567"
                 />
               </div>
@@ -143,7 +145,7 @@ export default function DashboardPage() {
                   max={20}
                   value={partySize}
                   onChange={(e) => setPartySize(parseInt(e.target.value) || 1)}
-                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                 />
               </div>
               <div>
@@ -153,7 +155,7 @@ export default function DashboardPage() {
                   value={resDate}
                   onChange={(e) => setResDate(e.target.value)}
                   min={today}
-                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                 />
               </div>
               <div>
@@ -161,7 +163,7 @@ export default function DashboardPage() {
                 <select
                   value={resTime}
                   onChange={(e) => setResTime(e.target.value)}
-                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                  className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                 >
                   {timeSlots.map((t, i) => (
                     <option key={i} value={t!}>{formatTime(t!)}</option>
@@ -174,7 +176,7 @@ export default function DashboardPage() {
               <input
                 value={specialReqs}
                 onChange={(e) => setSpecialReqs(e.target.value)}
-                className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                 placeholder="Allergies, celebrations, etc."
               />
             </div>
@@ -194,7 +196,7 @@ export default function DashboardPage() {
             <input
               value={customerSearch}
               onChange={(e) => setCustomerSearch(e.target.value)}
-              className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+              className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
               placeholder="Search by name, phone, or email..."
             />
             {searchLoading && customerSearch.length >= 2 && <LoadingSkeleton rows={2} />}

@@ -74,7 +74,7 @@ export default function CustomersPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm mt-2"
+          className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base mt-2"
           placeholder="Search by name, phone, or email..."
         />
       </BorderTile>
@@ -85,27 +85,27 @@ export default function CustomersPage() {
           <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">First Name</label>
-              <input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+              <input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Last Name</label>
-              <input value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+              <input value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Phone</label>
-              <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" placeholder="(555) 123-4567" />
+              <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" placeholder="(555) 123-4567" />
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Email</label>
-              <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+              <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Birthday</label>
-              <input value={form.birthday} onChange={(e) => setForm({ ...form, birthday: e.target.value })} type="date" className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+              <input value={form.birthday} onChange={(e) => setForm({ ...form, birthday: e.target.value })} type="date" className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div>
               <label className="block text-xs text-outline font-headline uppercase mb-1">Dietary Notes</label>
-              <input value={form.dietaryNotes} onChange={(e) => setForm({ ...form, dietaryNotes: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm" />
+              <input value={form.dietaryNotes} onChange={(e) => setForm({ ...form, dietaryNotes: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div className="sm:col-span-3 flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 cursor-pointer">

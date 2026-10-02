@@ -4,9 +4,10 @@ import { reservations } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 import { eq, gte, lte, and, sql } from "drizzle-orm";
+import { localDateKey } from "@/lib/date";
 
 export async function GET() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateKey();
 
   const todayCount = await db
     .select({ count: sql<number>`count(*)` })
@@ -23,8 +24,8 @@ export async function GET() {
     .from(reservations)
     .where(
       and(
-        gte(reservations.reservationDate, weekStart.toISOString().split("T")[0]),
-        lte(reservations.reservationDate, weekEnd.toISOString().split("T")[0])
+        gte(reservations.reservationDate, localDateKey(weekStart)),
+        lte(reservations.reservationDate, localDateKey(weekEnd))
       )
     );
 

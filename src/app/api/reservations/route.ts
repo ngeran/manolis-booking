@@ -4,6 +4,7 @@ import { reservations, customers } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
+import { localDateKey } from "@/lib/date";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -53,14 +54,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Party size must be between 1 and 20" }, { status: 400 });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateKey();
   if (reservationDate < today) {
     return NextResponse.json({ error: "Cannot book in the past" }, { status: 400 });
   }
 
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 60);
-  if (reservationDate > maxDate.toISOString().split("T")[0]) {
+  if (reservationDate > localDateKey(maxDate)) {
     return NextResponse.json({ error: "Max 60 days in advance" }, { status: 400 });
   }
 

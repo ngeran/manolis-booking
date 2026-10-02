@@ -11,6 +11,10 @@ export default auth((req) => {
   if (isPublic) return NextResponse.next();
 
   if (!isLoggedIn) {
+    // API callers should get JSON, not a redirect to the login page's HTML
+    if (pathname.startsWith("/api")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

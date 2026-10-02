@@ -103,7 +103,7 @@ export default function SettingsPage() {
                     onChange={(e) => setForm({ ...form, username: e.target.value })}
                     required
                     disabled={!!editing}
-                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm disabled:opacity-50"
+                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -115,7 +115,7 @@ export default function SettingsPage() {
                     value={form.password}
                     onChange={(e) => setForm({ ...form, password: e.target.value })}
                     required={!editing}
-                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   />
                 </div>
                 <div>
@@ -124,7 +124,7 @@ export default function SettingsPage() {
                     value={form.fullName}
                     onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                     required
-                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   />
                 </div>
                 <div>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required
-                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   />
                 </div>
                 <div>
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                   <select
                     value={form.role}
                     onChange={(e) => setForm({ ...form, role: e.target.value as any })}
-                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-sm"
+                    className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   >
                     <option value="staff">Staff</option>
                     <option value="manager">Manager</option>

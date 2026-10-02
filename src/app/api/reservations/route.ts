@@ -105,38 +105,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Customer ID or phone required" }, { status: 400 });
   }
 
-  const booked = await db.transaction(async (tx) => {
-    // Serialize concurrent bookings for the same slot; the advisory lock is
-    // released automatically when the transaction ends
-    await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(hashtext(${reservationDate} || ' ' || ${reservationTime}))`
-    );
-
-    const [row] = await tx
-      .select({ total: sql<number>`COALESCE(sum(${reservations.partySize}), 0)` })
-      .from(reservations)
-      .where(
-        and(
-          eq(reservations.reservationDate, reservationDate),
-          eq(reservations.reservationTime, reservationTime),
-          ne(reservations.status, "cancelled")
-        )
+  try {
+    const booked = await db.transaction(async (tx) => {
+      // Serialize concurrent bookings for the same slot; the advisory lock is
+      // released automatically when the transaction ends
+      await tx.execute(
+        sql`SELECT pg_advisory_xact_lock(hashtext(${reservationDate} || ' ' || ${reservationTime}))`
       );
 
-    if (!slotHasCapacity(Number(row?.total ?? 0), partySize, MAX_COVERS_PER_SLOT)) {
-      return null;
+      const [row] = await tx
+        .select({ total: sql<number>`COALESCE(sum(${reservations.partySize}), 0)` })
+        .from(reservations)
+        .where(
+          and(
+            eq(reservations.reservationDate, reservationDate),
+            eq(reservations.reservationTime, reservationTime),
+            ne(reservations.status, "cancelled")
+          )
+        );
+
+      if (!slotHasCapacity(Number(row?.total ?? 0), partySize, MAX_COVERS_PER_SLOT)) {
+        return null;
+      }
+
+      const [reservation] = await tx
+        .insert(reservations)
+        .values({ customerId: finalCustomerId, partySize, reservationDate, reservationTime, employeeId, specialRequests })
+        .returning();
+      return reservation;
+    });
+
+    if (!booked) {
+      return NextResponse.json({ error: "Time slot is full — try another time" }, { status: 409 });
     }
 
-    const [reservation] = await tx
-      .insert(reservations)
-      .values({ customerId: finalCustomerId, partySize, reservationDate, reservationTime, employeeId, specialRequests })
-      .returning();
-    return reservation;
-  });
-
-  if (!booked) {
-    return NextResponse.json({ error: "Time slot is full — try another time" }, { status: 409 });
+    return NextResponse.json(booked, { status: 201 });
+  } catch (err: any) {
+    // 23505 = unique violation — typically the legacy unique_booking index is
+    // still in place because db:push hasn't run against this database yet
+    if (err?.code === "23505") {
+      return NextResponse.json(
+        { error: "Slot conflict — this date, time, and party size is already booked" },
+        { status: 409 }
+      );
+    }
+    console.error("[RESERVATIONS] Booking failed:", err);
+    return NextResponse.json({ error: "Booking failed — please try again" }, { status: 500 });
   }
-
-  return NextResponse.json(booked, { status: 201 });
 }

@@ -31,8 +31,8 @@ export function useCreateEmployee() {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed");
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Request failed (${res.status})`);
       }
       return res.json();
     },
@@ -50,8 +50,8 @@ export function useUpdateEmployee() {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed");
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Request failed (${res.status})`);
       }
       return res.json();
     },
@@ -65,8 +65,8 @@ export function useDeleteEmployee() {
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/settings/employees/${id}`, { method: "DELETE" });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed");
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Request failed (${res.status})`);
       }
       return res.json();
     },

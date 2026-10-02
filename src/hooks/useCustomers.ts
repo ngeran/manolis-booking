@@ -38,8 +38,8 @@ export function useCreateCustomer() {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to create customer");
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Failed to create customer (${res.status})`);
       }
       return res.json();
     },

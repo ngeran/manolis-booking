@@ -58,10 +58,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(existing[0]);
   }
 
-  const [customer] = await db
-    .insert(customers)
-    .values({ firstName, lastName, phone, email, dietaryNotes, birthday, optInMarketing })
-    .returning();
-
-  return NextResponse.json(customer, { status: 201 });
+  try {
+    const [customer] = await db
+      .insert(customers)
+      .values({ firstName, lastName, phone, email, dietaryNotes, birthday, optInMarketing })
+      .returning();
+    return NextResponse.json(customer, { status: 201 });
+  } catch (err: any) {
+    // 23505 = unique violation — a customer with this phone was created mid-flight
+    if (err?.code === "23505") {
+      return NextResponse.json({ error: "A customer with this phone already exists" }, { status: 409 });
+    }
+    throw err;
+  }
 }

@@ -78,15 +78,23 @@ export async function POST(req: NextRequest) {
       finalCustomerId = existing[0].id;
     } else {
       const parts = (customerName || "Unknown").split(" ");
-      const [created] = await db
-        .insert(customers)
-        .values({
-          firstName: parts[0] || "Unknown",
-          lastName: parts.slice(1).join(" ") || "",
-          phone: customerPhone,
-        })
-        .returning();
-      finalCustomerId = created.id;
+      try {
+        const [created] = await db
+          .insert(customers)
+          .values({
+            firstName: parts[0] || "Unknown",
+            lastName: parts.slice(1).join(" ") || "",
+            phone: customerPhone,
+          })
+          .returning();
+        finalCustomerId = created.id;
+      } catch (err: any) {
+        // 23505 = unique violation — another request created this phone mid-flight
+        if (err?.code !== "23505") throw err;
+        const [existing] = await db.select().from(customers).where(eq(customers.phone, customerPhone)).limit(1);
+        if (!existing) throw err;
+        finalCustomerId = existing.id;
+      }
     }
   }
 
@@ -110,10 +118,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Time slot already booked for this party size" }, { status: 409 });
   }
 
-  const [reservation] = await db
-    .insert(reservations)
-    .values({ customerId: finalCustomerId, partySize, reservationDate, reservationTime, employeeId, specialRequests })
-    .returning();
+  try {
+    const [reservation] = await db
+      .insert(reservations)
+      .values({ customerId: finalCustomerId, partySize, reservationDate, reservationTime, employeeId, specialRequests })
+      .returning();
 
-  return NextResponse.json(reservation, { status: 201 });
+    return NextResponse.json(reservation, { status: 201 });
+  } catch (err: any) {
+    // 23505 = unique violation — lost a race against the duplicate check above
+    if (err?.code === "23505") {
+      return NextResponse.json({ error: "Time slot already booked for this party size" }, { status: 409 });
+    }
+    throw err;
+  }
 }

@@ -29,5 +29,6 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Public assets (PWA manifest, icons, favicon) must bypass auth
+  matcher: ["/((?!_next|favicon|manifest.webmanifest|icon-|apple-touch-icon).*)"],
 };

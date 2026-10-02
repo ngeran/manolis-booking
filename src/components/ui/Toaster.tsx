@@ -11,7 +11,7 @@ export function Toaster() {
           background: "#0E0E0E",
           border: "1px solid #003642",
           color: "#fff",
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "var(--font-body), 'Inter', sans-serif",
           borderRadius: "0px",
         },
       }}

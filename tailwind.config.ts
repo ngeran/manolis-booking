@@ -19,8 +19,8 @@ const config: Config = {
         surface: "#1F1F1F",
       },
       fontFamily: {
-        headline: ["'Space Grotesk'", "monospace"],
-        body: ["'Inter'", "sans-serif"],
+        headline: ["var(--font-headline)", "'Space Grotesk'", "monospace"],
+        body: ["var(--font-body)", "'Inter'", "sans-serif"],
       },
       letterSpacing: {
         headline: "0.05rem",

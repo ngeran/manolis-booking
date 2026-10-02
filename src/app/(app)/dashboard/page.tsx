@@ -8,6 +8,7 @@ import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useDashboardStats } from "@/hooks/useDashboard";
 import { useReservations, useCreateReservation } from "@/hooks/useReservations";
 import { useCustomers } from "@/hooks/useCustomers";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 // Local calendar date — toISOString() would shift the day in UTC+ timezones
 function getToday() {
@@ -53,8 +54,9 @@ export default function DashboardPage() {
   const [specialReqs, setSpecialReqs] = useState("");
 
   const [customerSearch, setCustomerSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(customerSearch);
   const { data: searchResults, isLoading: searchLoading } = useCustomers(
-    customerSearch.length >= 2 ? customerSearch : undefined
+    debouncedSearch.length >= 2 ? debouncedSearch : undefined
   );
 
   async function handleQuickBook(e: React.FormEvent) {
@@ -183,7 +185,7 @@ export default function DashboardPage() {
             <button
               type="submit"
               disabled={createRes.isPending}
-              className="w-full bg-obsidian text-white py-2.5 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50"
+              className="w-full bg-obsidian text-white py-2.5 min-h-[44px] font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50"
             >
               {createRes.isPending ? "Booking..." : "Book Reservation"}
             </button>
@@ -199,8 +201,8 @@ export default function DashboardPage() {
               className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
               placeholder="Search by name, phone, or email..."
             />
-            {searchLoading && customerSearch.length >= 2 && <LoadingSkeleton rows={2} />}
-            {searchResults && customerSearch.length >= 2 && (
+            {searchLoading && debouncedSearch.length >= 2 && <LoadingSkeleton rows={2} />}
+            {searchResults && debouncedSearch.length >= 2 && (
               <div className="space-y-2 max-h-48 sm:max-h-64 overflow-auto">
                 {searchResults.length === 0 && (
                   <p className="text-xs text-outline font-headline">No customers found</p>

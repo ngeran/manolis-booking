@@ -14,7 +14,8 @@ const config: Config = {
         obsidian: "#003642",
         "cyber-blue": "#00A2FD",
         "tactical-gold": "#F1BC93",
-        outline: "#41484B",
+        // Dim gray for labels/secondary text — ≥4.5:1 on black (WCAG AA)
+        outline: "#737A7E",
         "surface-low": "#0E0E0E",
         surface: "#1F1F1F",
       },

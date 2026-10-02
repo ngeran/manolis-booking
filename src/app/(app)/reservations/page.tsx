@@ -7,6 +7,7 @@ import BorderTile from "@/components/ui/BorderTile";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useReservations, useCreateReservation, useUpdateReservation, useCancelReservation, Reservation } from "@/hooks/useReservations";
 import { useCustomers } from "@/hooks/useCustomers";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 function formatTime(t: string) {
   const [h, m] = t.split(":");
@@ -131,7 +132,8 @@ export default function ReservationsPage() {
 
   // Customer lookup for autofill
   const [phoneLookup, setPhoneLookup] = useState("");
-  const { data: foundCustomers } = useCustomers(phoneLookup.length >= 3 ? phoneLookup : undefined);
+  const debouncedPhoneLookup = useDebouncedValue(phoneLookup);
+  const { data: foundCustomers } = useCustomers(debouncedPhoneLookup.length >= 3 ? debouncedPhoneLookup : undefined);
 
   function handlePhoneBlur() {
     if (!foundCustomers?.length) return;
@@ -213,15 +215,15 @@ export default function ReservationsPage() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="font-headline text-xl sm:text-2xl uppercase tracking-headline">Reservations</h1>
         <div className="flex items-center gap-2">
-          <button onClick={() => reservations && exportCSV(reservations)} disabled={!reservations?.length} className="btn-ghost text-xs px-2 sm:px-3 py-1.5 font-headline uppercase">CSV</button>
-          <button onClick={() => setShowAdd(true)} className="btn-primary text-xs font-headline uppercase tracking-headline">+ Add</button>
+          <button onClick={() => reservations && exportCSV(reservations)} disabled={!reservations?.length} className="btn-ghost text-xs px-2 sm:px-3 py-2 min-h-[44px] font-headline uppercase">CSV</button>
+          <button onClick={() => setShowAdd(true)} className="btn-primary text-xs min-h-[44px] font-headline uppercase tracking-headline">+ Add</button>
         </div>
       </div>
 
       {/* Week Navigation */}
       <BorderTile>
         <div className="flex items-center justify-between gap-2">
-          <button onClick={() => setWeekOffset(w => w - 1)} className="btn-ghost text-xs px-2 py-1">
+          <button onClick={() => setWeekOffset(w => w - 1)} className="btn-ghost text-xs px-3 py-2 min-h-[44px]">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           </button>
           <div className="text-center">
@@ -232,7 +234,7 @@ export default function ReservationsPage() {
               <button onClick={() => setWeekOffset(0)} className="block mx-auto text-xs text-cyber-blue font-headline uppercase mt-0.5">Today</button>
             )}
           </div>
-          <button onClick={() => setWeekOffset(w => w + 1)} className="btn-ghost text-xs px-2 py-1">
+          <button onClick={() => setWeekOffset(w => w + 1)} className="btn-ghost text-xs px-3 py-2 min-h-[44px]">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
           </button>
         </div>
@@ -328,20 +330,20 @@ export default function ReservationsPage() {
 
                     {/* Row 2: actions */}
                     <div className="flex items-center gap-2 flex-wrap pl-0 sm:pl-[72px]">
-                      <button onClick={() => openEdit(r)} className="border border-obsidian text-outline text-xs px-2 py-1 font-headline uppercase hover:border-cyber-blue hover:text-cyber-blue">
+                      <button onClick={() => openEdit(r)} className="border border-obsidian text-outline text-xs min-h-[44px] px-3 py-2 font-headline uppercase hover:border-cyber-blue hover:text-cyber-blue">
                         Edit
                       </button>
                       {r.status === "confirmed" && (
                         <>
-                          <button onClick={() => handleStatusChange(r.id, "seated")} className="border border-green-800 text-green-400 text-xs px-2 py-1 font-headline uppercase hover:bg-green-900/20">Seat</button>
-                          <button onClick={() => handleStatusChange(r.id, "no_show")} className="border border-yellow-600 text-yellow-500 text-xs px-2 py-1 font-headline uppercase hover:bg-yellow-500/10">No Show</button>
+                          <button onClick={() => handleStatusChange(r.id, "seated")} className="border border-green-800 text-green-400 text-xs min-h-[44px] px-3 py-2 font-headline uppercase hover:bg-green-900/20">Seat</button>
+                          <button onClick={() => handleStatusChange(r.id, "no_show")} className="border border-yellow-600 text-yellow-500 text-xs min-h-[44px] px-3 py-2 font-headline uppercase hover:bg-yellow-500/10">No Show</button>
                         </>
                       )}
                       {r.status === "seated" && (
-                        <button onClick={() => handleStatusChange(r.id, "confirmed")} className="border border-cyber-blue text-cyber-blue text-xs px-2 py-1 font-headline uppercase">Undo Seat</button>
+                        <button onClick={() => handleStatusChange(r.id, "confirmed")} className="border border-cyber-blue text-cyber-blue text-xs min-h-[44px] px-3 py-2 font-headline uppercase">Undo Seat</button>
                       )}
                       {r.status !== "cancelled" && (
-                        <button onClick={() => handleCancel(r.id)} className="border border-red-800 text-red-400 text-xs px-2 py-1 font-headline uppercase hover:bg-red-900/20">Cancel</button>
+                        <button onClick={() => handleCancel(r.id)} className="border border-red-800 text-red-400 text-xs min-h-[44px] px-3 py-2 font-headline uppercase hover:bg-red-900/20">Cancel</button>
                       )}
                     </div>
                   </div>
@@ -367,7 +369,7 @@ export default function ReservationsPage() {
                   className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base"
                   placeholder="(555) 123-4567"
                 />
-                {foundCustomers && foundCustomers.length > 0 && phoneLookup.length >= 3 && (
+                {foundCustomers && foundCustomers.length > 0 && debouncedPhoneLookup.length >= 3 && (
                   <p className="text-xs text-cyber-blue mt-1">Found: {foundCustomers[0].firstName} {foundCustomers[0].lastName}</p>
                 )}
               </div>
@@ -397,10 +399,10 @@ export default function ReservationsPage() {
               <input value={addForm.specialRequests} onChange={(e) => setAddForm({ ...addForm, specialRequests: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" placeholder="Allergies, celebrations..." />
             </div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" disabled={createRes.isPending} className="flex-1 bg-obsidian text-white py-2.5 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50">
+              <button type="submit" disabled={createRes.isPending} className="flex-1 bg-obsidian text-white py-2.5 min-h-[44px] font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50">
                 {createRes.isPending ? "Booking..." : "Book Reservation"}
               </button>
-              <button type="button" onClick={() => setShowAdd(false)} className="btn-ghost text-xs px-4">Cancel</button>
+              <button type="button" onClick={() => setShowAdd(false)} className="btn-ghost text-xs px-4 min-h-[44px]">Cancel</button>
             </div>
           </form>
         </Modal>
@@ -444,10 +446,10 @@ export default function ReservationsPage() {
               <input value={editForm.specialRequests} onChange={(e) => setEditForm({ ...editForm, specialRequests: e.target.value })} className="w-full bg-surface-low text-white px-3 py-2 border border-obsidian focus:border-cyber-blue focus:outline-none text-base" />
             </div>
             <div className="flex gap-2 pt-2">
-              <button type="submit" disabled={updateRes.isPending} className="flex-1 bg-obsidian text-white py-2.5 font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50">
+              <button type="submit" disabled={updateRes.isPending} className="flex-1 bg-obsidian text-white py-2.5 min-h-[44px] font-headline uppercase tracking-headline hover:brightness-110 active:animate-pulse transition-all disabled:opacity-50">
                 {updateRes.isPending ? "Saving..." : "Save Changes"}
               </button>
-              <button type="button" onClick={() => setEditRes(null)} className="btn-ghost text-xs px-4">Cancel</button>
+              <button type="button" onClick={() => setEditRes(null)} className="btn-ghost text-xs px-4 min-h-[44px]">Cancel</button>
             </div>
           </form>
         </Modal>

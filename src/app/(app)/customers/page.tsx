@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import BorderTile from "@/components/ui/BorderTile";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useCustomers, useCreateCustomer, useUpdateCustomer, Customer } from "@/hooks/useCustomers";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export default function CustomersPage() {
   const [search, setSearch] = useState("");
-  const { data: customers, isLoading } = useCustomers(search.length >= 2 ? search : undefined);
+  const debouncedSearch = useDebouncedValue(search);
+  const { data: customers, isLoading } = useCustomers(debouncedSearch.length >= 2 ? debouncedSearch : undefined);
   const createCust = useCreateCustomer();
   const updateCust = useUpdateCustomer();
 
@@ -64,7 +66,7 @@ export default function CustomersPage() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="font-headline text-xl sm:text-2xl uppercase tracking-headline">Customers</h1>
-        <button onClick={() => { resetForm(); setShowAdd(true); }} className="btn-primary text-xs font-headline uppercase tracking-headline">
+        <button onClick={() => { resetForm(); setShowAdd(true); }} className="btn-primary text-xs min-h-[44px] font-headline uppercase tracking-headline">
           + Add
         </button>
       </div>

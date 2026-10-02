@@ -15,6 +15,10 @@ export interface Reservation {
   customerPhone: string;
 }
 
+type ReservationPatch = Partial<
+  Pick<Reservation, "partySize" | "reservationTime" | "status" | "specialRequests">
+>;
+
 export function useReservations(date?: string, from?: string, to?: string) {
   const params = new URLSearchParams();
   if (date) params.set("date", date);
@@ -50,19 +54,48 @@ export function useCreateReservation() {
   });
 }
 
+// Apply a patch optimistically to every cached reservations list (week views,
+// day views, dashboards) so the UI reacts instantly; roll back on failure.
+function patchCachedReservations(
+  qc: ReturnType<typeof useQueryClient>,
+  id: string,
+  patch: ReservationPatch
+) {
+  const cached = qc.getQueriesData<Reservation[]>({ queryKey: ["reservations"] });
+  for (const [key, data] of cached) {
+    if (!data) continue;
+    qc.setQueryData<Reservation[]>(
+      key,
+      data.map((r) => (r.id === id ? { ...r, ...patch } : r))
+    );
+  }
+  return cached;
+}
+
 export function useUpdateReservation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string } & Record<string, any>) => {
+    mutationFn: async ({ id, ...data }: { id: string } & ReservationPatch) => {
       const res = await fetch(`/api/reservations/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to update reservation");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to update reservation");
+      }
       return res.json();
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["reservations"] }),
+    onMutate: async ({ id, ...patch }) => {
+      await qc.cancelQueries({ queryKey: ["reservations"] });
+      const previous = patchCachedReservations(qc, id, patch);
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.previous.forEach(([key, data]) => qc.setQueryData(key, data));
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["reservations"] }),
   });
 }
 
@@ -71,9 +104,20 @@ export function useCancelReservation() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to cancel reservation");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to cancel reservation");
+      }
       return res.json();
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["reservations"] }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ["reservations"] });
+      const previous = patchCachedReservations(qc, id, { status: "cancelled" });
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.previous.forEach(([key, data]) => qc.setQueryData(key, data));
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["reservations"] }),
   });
 }

@@ -164,7 +164,7 @@ export default function SettingsPage() {
             <div className="flex justify-end mt-1 mb-2">
               <button
                 onClick={() => { resetForm(); setShowForm(true); }}
-                className="btn-primary text-xs font-headline uppercase tracking-headline"
+                className="btn-primary text-xs min-h-[44px] font-headline uppercase tracking-headline"
               >
                 + Add Employee
               </button>
@@ -241,9 +241,9 @@ export default function SettingsPage() {
                         </span>
                       </div>
                       <div className="flex gap-3 mt-2">
-                        <button onClick={() => startEdit(emp)} className="text-cyber-blue text-xs font-headline uppercase">Edit</button>
+                        <button onClick={() => startEdit(emp)} className="text-cyber-blue text-xs py-2 min-h-[44px] font-headline uppercase">Edit</button>
                         {emp.id !== currentUserId && (
-                          <button onClick={() => handleDelete(emp.id, emp.fullName)} className="text-red-400 text-xs font-headline uppercase">Remove</button>
+                          <button onClick={() => handleDelete(emp.id, emp.fullName)} className="text-red-400 text-xs py-2 min-h-[44px] font-headline uppercase">Remove</button>
                         )}
                       </div>
                     </div>

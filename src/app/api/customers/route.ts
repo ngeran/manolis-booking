@@ -61,7 +61,16 @@ export async function POST(req: NextRequest) {
   try {
     const [customer] = await db
       .insert(customers)
-      .values({ firstName, lastName, phone, email, dietaryNotes, birthday, optInMarketing })
+      .values({
+        firstName,
+        lastName,
+        phone,
+        // Empty strings would fail Postgres (invalid date / empty optional fields)
+        email: email || null,
+        dietaryNotes: dietaryNotes || null,
+        birthday: birthday || null,
+        optInMarketing,
+      })
       .returning();
     return NextResponse.json(customer, { status: 201 });
   } catch (err: any) {

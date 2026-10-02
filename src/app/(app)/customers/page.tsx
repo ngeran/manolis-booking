@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import BorderTile from "@/components/ui/BorderTile";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
-import { useCustomers, useCreateCustomer, useUpdateCustomer, Customer } from "@/hooks/useCustomers";
+import { useCustomers, useCreateCustomer, useUpdateCustomer, useDeleteCustomer, Customer } from "@/hooks/useCustomers";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export default function CustomersPage() {
@@ -13,6 +13,7 @@ export default function CustomersPage() {
   const { data: customers, isLoading } = useCustomers(debouncedSearch.length >= 2 ? debouncedSearch : undefined);
   const createCust = useCreateCustomer();
   const updateCust = useUpdateCustomer();
+  const deleteCust = useDeleteCustomer();
 
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
@@ -44,6 +45,17 @@ export default function CustomersPage() {
       optInMarketing: c.optInMarketing,
     });
     setEditing(c);
+  }
+
+  async function handleDelete(c: Customer) {
+    if (!confirm(`Delete ${c.firstName} ${c.lastName}? This cannot be undone.`)) return;
+    try {
+      await deleteCust.mutateAsync(c.id);
+      toast.success("Customer deleted");
+      if (editing?.id === c.id) resetForm();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -153,7 +165,10 @@ export default function CustomersPage() {
                     <td className="px-3 py-2 text-outline">{c.lastVisit ? new Date(c.lastVisit).toLocaleDateString() : "—"}</td>
                     <td className="px-3 py-2 text-center">{c.optInMarketing ? <span className="text-cyber-blue">YES</span> : <span className="text-outline">NO</span>}</td>
                     <td className="px-3 py-2">
-                      <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs font-headline uppercase hover:underline">Edit</button>
+                      <div className="flex gap-3">
+                        <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs font-headline uppercase hover:underline">Edit</button>
+                        <button onClick={() => handleDelete(c)} disabled={deleteCust.isPending} className="text-red-400 text-xs font-headline uppercase hover:underline disabled:opacity-50">Delete</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -183,7 +198,10 @@ export default function CustomersPage() {
                     <p className="text-xs text-outline">{c.phone}</p>
                     {c.email && <p className="text-xs text-outline">{c.email}</p>}
                   </div>
-                  <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs font-headline uppercase ml-2">Edit</button>
+                  <div className="flex gap-3 ml-2">
+                    <button onClick={() => startEdit(c)} className="text-cyber-blue text-xs py-2 min-h-[44px] font-headline uppercase">Edit</button>
+                    <button onClick={() => handleDelete(c)} disabled={deleteCust.isPending} className="text-red-400 text-xs py-2 min-h-[44px] font-headline uppercase disabled:opacity-50">Delete</button>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 mt-2 text-xs text-outline">
                   <span>{c.totalVisits} visits</span>

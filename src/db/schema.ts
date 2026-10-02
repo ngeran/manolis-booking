@@ -10,7 +10,6 @@ import {
   timestamp,
   boolean,
   numeric,
-  uniqueIndex,
   primaryKey,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
@@ -73,14 +72,9 @@ export const reservations = pgTable(
     status: statusEnum("status").default("confirmed").notNull(),
     specialRequests: text("special_requests"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => ({
-    uniqueBooking: uniqueIndex("unique_booking").on(
-      table.reservationDate,
-      table.reservationTime,
-      table.partySize
-    ),
-  })
+  }
+  // No unique index on (date, time, partySize) — slot capacity is enforced by a
+  // covers-per-slot check in POST /api/reservations, not by the schema.
 );
 
 // ── Campaigns ──────────────────────────────────────────

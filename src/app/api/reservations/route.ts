@@ -3,8 +3,11 @@ import { db } from "@/db";
 import { reservations, customers } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
-import { eq, and, gte, lte, sql } from "drizzle-orm";
+import { eq, and, gte, lte, ne, sql } from "drizzle-orm";
 import { localDateKey } from "@/lib/date";
+import { slotHasCapacity } from "@/lib/booking";
+
+const MAX_COVERS_PER_SLOT = Number(process.env.MAX_COVERS_PER_SLOT) || 40;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -102,34 +105,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Customer ID or phone required" }, { status: 400 });
   }
 
-  const duplicate = await db
-    .select()
-    .from(reservations)
-    .where(
-      and(
-        eq(reservations.reservationDate, reservationDate),
-        eq(reservations.reservationTime, reservationTime),
-        eq(reservations.partySize, partySize)
-      )
-    )
-    .limit(1);
+  const booked = await db.transaction(async (tx) => {
+    // Serialize concurrent bookings for the same slot; the advisory lock is
+    // released automatically when the transaction ends
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtext(${reservationDate} || ' ' || ${reservationTime}))`
+    );
 
-  if (duplicate.length) {
-    return NextResponse.json({ error: "Time slot already booked for this party size" }, { status: 409 });
-  }
+    const [row] = await tx
+      .select({ total: sql<number>`COALESCE(sum(${reservations.partySize}), 0)` })
+      .from(reservations)
+      .where(
+        and(
+          eq(reservations.reservationDate, reservationDate),
+          eq(reservations.reservationTime, reservationTime),
+          ne(reservations.status, "cancelled")
+        )
+      );
 
-  try {
-    const [reservation] = await db
+    if (!slotHasCapacity(Number(row?.total ?? 0), partySize, MAX_COVERS_PER_SLOT)) {
+      return null;
+    }
+
+    const [reservation] = await tx
       .insert(reservations)
       .values({ customerId: finalCustomerId, partySize, reservationDate, reservationTime, employeeId, specialRequests })
       .returning();
+    return reservation;
+  });
 
-    return NextResponse.json(reservation, { status: 201 });
-  } catch (err: any) {
-    // 23505 = unique violation — lost a race against the duplicate check above
-    if (err?.code === "23505") {
-      return NextResponse.json({ error: "Time slot already booked for this party size" }, { status: 409 });
-    }
-    throw err;
+  if (!booked) {
+    return NextResponse.json({ error: "Time slot is full — try another time" }, { status: 409 });
   }
+
+  return NextResponse.json(booked, { status: 201 });
 }

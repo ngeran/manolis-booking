@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { isLockedOut, recordFailure, clearFailures } from "@/lib/rate-limit";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -18,6 +19,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
+        const username = (credentials.username as string).toLowerCase().trim();
+
+        // Throttle brute-force attempts per account (locked-out users get the
+        // same generic error as a wrong password)
+        if (isLockedOut(username)) {
+          console.warn("[AUTH] Login throttled for:", username);
+          return null;
+        }
+
         try {
           const user = await db
             .select()
@@ -25,13 +35,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             .where(eq(users.username, credentials.username as string))
             .limit(1);
 
-          if (!user.length) return null;
+          if (!user.length) {
+            recordFailure(username);
+            return null;
+          }
 
           const valid = await bcrypt.compare(
             credentials.password as string,
             user[0].passwordHash
           );
-          if (!valid) return null;
+          if (!valid) {
+            recordFailure(username);
+            return null;
+          }
+
+          clearFailures(username);
 
           await db
             .update(users)
